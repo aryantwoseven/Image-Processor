@@ -40,9 +40,6 @@ func negative(img image.Image) image.Image {
 }
 
 // histogram EQUALISATION
-// DILATION
-// EDGE DETECTION
-// GLOBAL THRESHOLDING
 
 func rgb2gray(img image.Image) image.Image {
 	b := img.Bounds()
@@ -77,14 +74,11 @@ func histogramEq(img image.Image) image.Image {
 		}
 	}
 
-	// 2. CDF
 	var cdf [256]int
 	cdf[0] = hist[0]
 	for i := 1; i < 256; i++ {
 		cdf[i] = cdf[i-1] + hist[i]
 	}
-
-	// 3. cdfMin
 	cdfMin := 0
 	for i := 0; i < 256; i++ {
 		if cdf[i] != 0 {
@@ -93,7 +87,6 @@ func histogramEq(img image.Image) image.Image {
 		}
 	}
 
-	// 4. LUT
 	size := bounds.Dx() * bounds.Dy()
 	denom := float64(size - cdfMin)
 	var lut [256]uint8
@@ -111,8 +104,6 @@ func histogramEq(img image.Image) image.Image {
 		}
 		lut[i] = uint8(val)
 	}
-
-	// 5. apply LUT
 	for y := bounds.Min.Y; y < bounds.Max.Y; y++ {
 		for x := bounds.Min.X; x < bounds.Max.X; x++ {
 			r, g, b, a := img.At(x, y).RGBA()
