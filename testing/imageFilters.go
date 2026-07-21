@@ -1,3 +1,4 @@
+// go:build ignore
 package main
 
 import (
@@ -8,6 +9,14 @@ import (
 	"image/png"
 	"os"
 )
+
+type kernel [][]int
+
+var sharp = kernel{
+	{0, -1, 0},
+	{-1, 5, -1},
+	{0, -1, 0},
+}
 
 func load(path string) (image.Image, string, error) {
 	file, err := os.Open(path)
@@ -21,6 +30,38 @@ func load(path string) (image.Image, string, error) {
 		return nil, "", err
 	}
 	return img, format, nil
+}
+
+func convolution(image.Image) kernel {
+	var out kernel
+	for x := 1; x < 14; x++ {
+		for y := 1; y < 14; y++ {
+			pixval := 0
+			a := 0
+			for i := x - 1; i <= x+1; i++ {
+				b := 0
+				for j := y - 1; j <= y-1; j++ {
+					pixval += k[i][j] * sharp[a][b]
+					b++
+				}
+				a++
+			}
+			out[x][y] = pixval
+		}
+	}
+	return out
+}
+func defKernel() kernel {
+
+}
+
+func printMatrix(k kernel) {
+	for i := 0; i < 15; i++ {
+		for j := 0; j < 15; j++ {
+			fmt.Printf("%4d ", k[i][j])
+		}
+		fmt.Println()
+	}
 }
 
 func negative(img image.Image) image.Image {
@@ -39,9 +80,13 @@ func negative(img image.Image) image.Image {
 	return out
 }
 
-// histogram EQUALISATION
+func sobel(img image.Image, gx kernel, gy kernel) image.Image {
+	b := img.Bounds()
+	out := image.NewGray(bounds)
 
-func rgb2gray(img image.Image) image.Image {
+}
+
+func rgb2gray(img image.Image) *image.Gray {
 	b := img.Bounds()
 	out := image.NewGray(b)
 	for y := b.Min.Y; y < b.Max.Y; y++ {
@@ -159,6 +204,12 @@ func main() {
 			result = rgb2gray(loaded)
 			outPath = "output_gray.png"
 		case 3:
+			result = histogramEq(loaded)
+			outPath = "output_histeq.png"
+		case 4:
+			result = histogramEq(loaded)
+			outPath = "output_histeq.png"
+		case 5:
 			result = histogramEq(loaded)
 			outPath = "output_histeq.png"
 		case 0:

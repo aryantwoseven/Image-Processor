@@ -29,25 +29,48 @@
 // 	{65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65, 65},
 // }
 
-// func convolution(k kernel) kernel {
-// 	var out kernel
-// 	for x := 1; x < 14; x++ {
-// 		for y := 1; y < 14; y++ {
-// 			pixval := 0
-// 			a := 0
-// 			for i := x - 1; i <= x+1; i++ {
-// 				b := 0
-// 				for j := y - 1; j <= y-1; j++ {
-// 					pixval += k[i][j] * sharp[a][b]
-// 					b++
-// 				}
-// 				a++
-// 			}
-// 			k[x][y] = pixval
-// 		}
-// 	}
-// 	return out
-// }
+func convolution(k kernel) kernel {
+	var out kernel
+	for x := 1; x < 14; x++ {
+		for y := 1; y < 14; y++ {
+			pixval := 0
+			a := 0
+			for i := x - 1; i <= x+1; i++ {
+				b := 0
+				for j := y - 1; j <= y+1; j++ {
+					pixval += k[i][j] * sharp[a][b]
+					b++
+				}
+				a++
+			}
+			k[x][y] = pixval
+		}
+	}
+	return out
+}
+
+func convolutioN(img image.Image, k kernel) [][]float64 {
+	var out [][]float64
+	grayscale := rgb2gray(img)
+	bounds := grayscale.bounds()
+	for y:= bounds.Min.Y+1; y<bounds.Max.Y-1; y++ {
+		for x:=bounds.Min.X+1; x<bounds.Max.Y-1; x++ {
+			pixval:=0
+			a:=a
+			for i:=x - 1; i<= x+1; i++ {
+				b:=0 
+				for j:= y-1; j <= y+1; j++ {
+					grayY := grayscale.GrayAt(i,j).Y
+					pixval += grayY * k[a][b]
+					b++
+				}
+				a++
+			}
+			out[x][y] = pixval
+		}
+	}
+	return out
+}
 
 // func printMatrix(k kernel) {
 // 	for i := 0; i < 15; i++ {
